@@ -17,6 +17,7 @@ class BotPoster():
 
 
     def message_meets_criteria(self, msg):
+        print(msg)
         correct_content = 'slack' in msg['text']
         correct_sender = msg['user'] in self.users_to_respond if self.users else True
         return correct_sender and correct_content
