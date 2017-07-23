@@ -1,33 +1,16 @@
-from slackclient import SlackClient
-from math import log, exp
-import time, random
+from flask import Flask, request
+from credentials import load_credentials
+from bot_poster import BotPoster
 
-class BotPoster():
+app = Flask(__name__)
+credentials = load_credentials(['bot_token'], 'credentials.json')
+bot = BotPoster(credentials['bot_token'])
 
-    def __init__(self, token, users_to_respond=None, prob_after_24h=0.95):
-        self.users = users_to_respond
-        self.slack_client = SlackClient(token)
-        self.last_posted = None
-        self.alpha =  self.calculate_alpha(prob_after_24h)
+@app.route('/message', methods=['POST'])
+def respond_to_message():
+    body = request.get_json()
+    bot.process_message(body)
+    return 'Message posted!'
 
-    def process_message(msg):
-        pass
 
-    def should_post(self):
-        time_elapsed = time.time() - self.last_posted
-        threshold = exp(self.alpha * time_elapsed)
-        random_number = random.random()
-        return random_number > threshold
-
-    def post_message(self, text, channel):
-        self.slack_client.api_call('chat.postMessage', channel=channel, text=text)
-        self.last_posted = time.now()
-
-    def calculate_alpha(prob_after_24h)
-        return - log(1 - prob_after_24h) / (24 * 60 * 60)
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
+app.run()
